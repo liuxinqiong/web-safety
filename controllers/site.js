@@ -1,11 +1,11 @@
 const bluebird = require('bluebird');
 const connectionModel = require('../models/connection');
 
-exports.login = async function(ctx, next){
-	ctx.render('login');
+exports.index = async function(ctx, next){
+	ctx.render('index');
 };
 
-exports.doLogin = async function(ctx, next){
+exports.post = async function(ctx, next){
 	try{
 
 		const data = ctx.request.body;

@@ -16,7 +16,7 @@ const Pug = require('koa-pug');
 	noCache: process.env.NODE_ENV === 'development'
 });
 
-const routes = ['user'];
+const routes = ['site', 'user'];
 routes.forEach((route) => {
 	app.use(require(`./routes/${route}`).routes());
 });
