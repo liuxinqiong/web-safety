@@ -9,6 +9,7 @@ const user = require('../controllers/user');
 	await next();
 });*/
 
-router.post('/login', user.login);
+router.get('/login', user.login);
+router.post('/login', user.doLogin);
 
 module.exports = router;

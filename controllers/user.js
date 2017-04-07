@@ -1,18 +1,26 @@
 const mysql = require('mysql');
-const connection = mysql.createConnection({
-	host: 'localhost',
-	database: 'safety'
-});
 const bluebird = require('bluebird');
-const query = bluebird.promisify(connection.query.bind(connection));
+
+const getConnection = function(){
+	let connection = mysql.createConnection({
+		host: 'localhost',
+		database: 'safety'
+	});
+	connection.connect();
+	return connection;
+};
 
 exports.login = async function(ctx, next){
+	ctx.render('login');
+};
+
+exports.doLogin = async function(ctx, next){
 	try{
 
 		const data = ctx.request.body;
 
-		connection.connect();
-
+		const connection = getConnection();
+		const query = bluebird.promisify(connection.query.bind(connection));
 		const results = await query(
 			`select * from user where
 			username = '${data.username}'
@@ -33,7 +41,6 @@ exports.login = async function(ctx, next){
 
 		connection.end();
 	}catch(e){
-		connection.end();
 		console.log('[/user/login] error:', e.message, e.stack);
 		ctx.body = {
 			status: e.code || -1,
