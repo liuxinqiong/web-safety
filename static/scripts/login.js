@@ -10,10 +10,9 @@ $form.addEventListener('submit', (e) => {
 		hash: true
 	});
 
-	axios.post('/user/login', {
-		data
-	}).then((data) => {
+	axios.post('/user/login', data).then((data) => {
 		if(data.status === 200 && data.data.status === 0){
+			location.href = '/';
 			console.log('登录成功');
 		}else{
 			modal.show({
