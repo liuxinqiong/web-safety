@@ -8,24 +8,20 @@ html
 		.indexWrapper
 			nav.top-nav
 				.nav-wrapper.container
-					a.page-title 首页
+					a.page-title
+						span 首页
+						if from
+							span - 欢迎来自!{from}的朋友
 			.container
 				.row.section
 					.col.s6
-						h4 第一列表
+						h4 文章列表
 						ul.section
-							li
-								a(href="#") 测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试
-							li
-								a(href="#") 测试测试测试测试测试测试测试测试测试测试测试测试测试测试测
-							li
-								a(href="#") 测试测试测试测试测试测试测试测试测测试测试
-							li
-								a(href="#") 测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试
-							li
-								a(href="#") 测试测试测试测试测试测试测试测试测试测试测试测试测试测试测
+							each post in posts
+								li
+									a(href="/post/"+post.id) #{post.title}
 					.col.s6
-						h4 第二列表
+						h4 评论列表
 						ul.section
 							li
 								a(href="#") 测试测试测试测试测试测试测试测试
@@ -40,4 +36,5 @@ html
 		script(src="/jspm_packages/system.js")
 		script(src="/config.js")
 		script.
-			System.import('scripts/login');
+			var from = "!{from}";
+			//- System.import('scripts/login');
