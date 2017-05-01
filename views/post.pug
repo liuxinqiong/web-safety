@@ -4,20 +4,23 @@ html
 		title #{post.title}
 		meta(name="viewport",content="width=device-width, initial-scale=1")
 		link(rel="stylesheet",href="/materialize/css/materialize.css")
+		link(rel="stylesheet",href="/materialize/css/main.css")
 	body
 		.indexWrapper
 			nav.top-nav
 				.nav-wrapper.container
-					a.page-title #{post.title}
+					a.page-title(href="/")
+						span 昨日头条
 			.container
 				.row.section
 					.col.s12
-						.post #{post.content}
+						h4.postTitle #{post.title}
+						.post !{post.content}
 				.row.section
 					.col.s12
 						.commentWrapper
 							ul
-								li.card.red.lighten-5
+								li.card.lighten-5
 									.card-content
 										form(name="commentForm",method="post",action="/post/addComment")
 											input(name="postId",type="hidden",value=post.id)
@@ -28,9 +31,9 @@ html
 											.input-field
 												button.waves-effect.waves-light.btn 发表
 								each comment in comments
-									li.card.red.lighten-5
+									li.card.lighten-5
 										.card-content
-											p.info #{comment.username} #{comment.createdAt}
+											p.info #{comment.username || '匿名用户'} #{comment.createdAt.toISOString().replace(/T.*/,'')}
 											p.content !{comment.content}
 
 		script(src="/jspm_packages/system.js")
