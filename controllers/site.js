@@ -40,10 +40,34 @@ exports.index = async function(ctx, next){
 
 var xssFilter = function(html){
 	if(!html) return '';
-	html = html.replace(/<\s*\/?script\s*>/g, '');
-	html = html.replace(/javascript:[^'"]*/g, '');
-	html = html.replace(/onerror\s*=\s*['"]?[^'"]*['"]?/g, '');
-	return html;
+	var cheerio = require('cheerio');
+	var $ = cheerio.load(html);
+
+	// 白名单
+	var whiteList = {
+		'img': ['src'],
+		'font': ['color', 'size'],
+		'a': ['href']
+	};
+
+	$('*').each(function(index, elem){
+		// console.log('this is elem:', elem);
+		if(!whiteList[elem.name]){
+			$(elem).remove();
+			return;
+		}
+
+		for(var attr in elem.attribs){
+			if(whiteList[elem.name].indexOf(attr) === -1){
+				$(elem).attr(attr, null);
+			}
+		}
+
+	});
+
+	console.log(html, $.html());
+
+	return $.html();
 };
 
 exports.post = async function(ctx, next){
