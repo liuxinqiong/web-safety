@@ -40,34 +40,23 @@ exports.index = async function(ctx, next){
 
 var xssFilter = function(html){
 	if(!html) return '';
-	var cheerio = require('cheerio');
-	var $ = cheerio.load(html);
 
-	// 白名单
-	var whiteList = {
-		'img': ['src'],
-		'font': ['color', 'size'],
-		'a': ['href']
-	};
-
-	$('*').each(function(index, elem){
-		// console.log('this is elem:', elem);
-		if(!whiteList[elem.name]){
-			$(elem).remove();
-			return;
+	var xss = require('xss');
+	var ret = xss(html, {
+		whiteList:{
+			img: ['src'],
+			a: ['href'],
+			font: ['size', 'color']
+		},
+		onIgnoreTag: function(){
+			return '';
 		}
-
-		for(var attr in elem.attribs){
-			if(whiteList[elem.name].indexOf(attr) === -1){
-				$(elem).attr(attr, null);
-			}
-		}
-
 	});
 
-	console.log(html, $.html());
 
-	return $.html();
+	console.log(html, ret);
+
+	return ret;
 };
 
 exports.post = async function(ctx, next){
