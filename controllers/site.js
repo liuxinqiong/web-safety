@@ -95,11 +95,23 @@ exports.post = async function(ctx, next){
 exports.addComment = async function(ctx, next){
 	try{
 		var data;
-		if(ctx.request.method === 'post'){
+		if(ctx.request.method.toLowerCase() === 'post'){
 			data = ctx.request.body;
 		}else{
 			data = ctx.request.query;
 		}
+		console.log(data.captcha);
+		if(!data.captcha){
+			throw new Error('验证码错误');
+		}
+
+		var captcha = require('../tools/captcha');
+		var captchaResult = captcha.validCache(ctx.cookies.get('userId'), data.captcha);
+		console.log('result', captchaResult);
+		if(!captchaResult){
+			throw new Error('验证码错误');
+		}
+
 		const connection = connectionModel.getConnection();
 		const query = bluebird.promisify(connection.query.bind(connection));
 		const result = await query(
