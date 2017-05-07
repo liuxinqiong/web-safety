@@ -12,12 +12,12 @@ var escapeHtml = function(str) {
 	return str;
 };
 
-/*var escapeForJs = function(str) {
+var escapeForJs = function(str) {
 	if(!str) return '';
 	str = str.replace(/\\/g, '\\\\');
 	str = str.replace(/"/g, '\\"');
 	return str;
-};*/
+};
 
 exports.index = async function(ctx, next){
 	const connection = connectionModel.getConnection();
@@ -94,7 +94,12 @@ exports.post = async function(ctx, next){
 
 exports.addComment = async function(ctx, next){
 	try{
-		const data = ctx.request.body;
+		var data;
+		if(ctx.request.method === 'post'){
+			data = ctx.request.body;
+		}else{
+			data = ctx.request.query;
+		}
 		const connection = connectionModel.getConnection();
 		const query = bluebird.promisify(connection.query.bind(connection));
 		const result = await query(
