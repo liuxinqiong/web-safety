@@ -63,6 +63,10 @@ exports.post = async function(ctx, next){
 	try{
 		console.log('enter post');
 
+		var csrfToken = parseInt(Math.random() * 9999999,10);
+		ctx.cookies.set('csrfToken', csrfToken);
+
+
 		const id = ctx.params.id;
 		const connection = connectionModel.getConnection();
 		const query = bluebird.promisify(connection.query.bind(connection));
@@ -78,7 +82,7 @@ exports.post = async function(ctx, next){
 			comment.content = xssFilter(comment.content);
 		});
 		if(post){
-			ctx.render('post', {post, comments});
+			ctx.render('post', {post, comments, csrfToken});
 		}else{
 			ctx.status = 404;
 		}
@@ -100,16 +104,13 @@ exports.addComment = async function(ctx, next){
 		}else{
 			data = ctx.request.query;
 		}
-		console.log(data.captcha);
-		if(!data.captcha){
-			throw new Error('验证码错误');
+
+		if(!data.csrfToken){
+			throw new Error('CSRF Token为空');
 		}
 
-		var captcha = require('../tools/captcha');
-		var captchaResult = captcha.validCache(ctx.cookies.get('userId'), data.captcha);
-		console.log('result', captchaResult);
-		if(!captchaResult){
-			throw new Error('验证码错误');
+		if(data.csrfToken !== ctx.cookies.get('csrfToken')){
+			throw new Error('CSRF Token错误');
 		}
 
 		const connection = connectionModel.getConnection();

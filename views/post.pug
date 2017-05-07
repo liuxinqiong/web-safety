@@ -5,6 +5,7 @@ html
 		meta(name="viewport",content="width=device-width, initial-scale=1")
 		link(rel="stylesheet",href="/materialize/css/materialize.css")
 		link(rel="stylesheet",href="/materialize/css/main.css")
+		meta(name="csrf_token",content=csrfToken)
 	body
 		.indexWrapper
 			nav.top-nav
@@ -27,10 +28,9 @@ html
 											//- .input-field
 												input(name="username",placeholder="名字")
 											.input-field
-												textarea(placeholder="内容",name="content",class="materialize-textarea")
+												input(name="csrfToken",value=csrfToken)
 											.input-field
-												input(name="captcha",placeholder="验证码")
-												img(src="/captcha")
+												textarea(placeholder="内容",name="content",class="materialize-textarea")
 											.input-field
 												button.waves-effect.waves-light.btn 发表
 								each comment in comments
