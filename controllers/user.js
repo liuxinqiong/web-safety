@@ -1,5 +1,7 @@
 const bluebird = require('bluebird');
 const connectionModel = require('../models/connection');
+const crypt = require('../tools/crypt');
+
 
 exports.login = async function(ctx, next){
 	ctx.render('login');
@@ -20,10 +22,16 @@ exports.doLogin = async function(ctx, next){
 			let user = results[0];
 
 			// 登录成功，设置cookie
+			ctx.cookies.set('sign', crypt.cryptUserId(user.id), {
+				httpOnly:false,
+				sameSite:'strict'
+			});
+
 			ctx.cookies.set('userId', user.id, {
 				httpOnly:false,
 				sameSite:'strict'
 			});
+
 
 			ctx.body = {
 				status: 0,
