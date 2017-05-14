@@ -1,5 +1,8 @@
 const bluebird = require('bluebird');
 const connectionModel = require('../models/connection');
+const crypt = require('../tools/crypt');
+const session = require('../tools/session');
+
 
 var escapeHtml = function(str) {
 	if(!str) return '';
@@ -63,10 +66,6 @@ exports.post = async function(ctx, next){
 	try{
 		console.log('enter post');
 
-		var csrfToken = parseInt(Math.random() * 9999999,10);
-		ctx.cookies.set('csrfToken', csrfToken);
-
-
 		const id = ctx.params.id;
 		const connection = connectionModel.getConnection();
 		const query = bluebird.promisify(connection.query.bind(connection));
@@ -82,7 +81,7 @@ exports.post = async function(ctx, next){
 			comment.content = xssFilter(comment.content);
 		});
 		if(post){
-			ctx.render('post', {post, comments, csrfToken});
+			ctx.render('post', {post, comments});
 		}else{
 			ctx.status = 404;
 		}
@@ -105,18 +104,31 @@ exports.addComment = async function(ctx, next){
 			data = ctx.request.query;
 		}
 
-		if(!data.csrfToken){
-			throw new Error('CSRF Token为空');
-		}
+		var referer = ctx.request.headers.referer;
+		// console.log(ctx.request.headers, referer);
+		// if(!/^https?:\/\/localhost/.test(referer)){
+		// if(referer.indexOf('localhost') === -1){
+			// throw new Error('非法请求');
+		// }
 
-		if(data.csrfToken !== ctx.cookies.get('csrfToken')){
-			throw new Error('CSRF Token错误');
+		var sessionId = ctx.cookies.get('sessionId');
+		var sessionObj = session.get(sessionId);
+		if(!sessionObj || !sessionObj.userId){
+			throw new Error('session不存在');
 		}
+		var userId = sessionObj.userId;
+
+		/*var userId = ctx.cookies.get('userId');
+		var sign = ctx.cookies.get('sign');
+		var correctSign = crypt.cryptUserId(userId);
+		if(correctSign !== sign){
+			throw new Error('报告，有人入侵');
+		}*/
 
 		const connection = connectionModel.getConnection();
 		const query = bluebird.promisify(connection.query.bind(connection));
 		const result = await query(
-			`insert into comment(userId,postId,content,createdAt) values("${ctx.cookies.get('userId')}", "${data.postId}", "${data.content}","${new Date().toISOString()}")`
+			`insert into comment(userId,postId,content,createdAt) values("${userId}", "${data.postId}", "${data.content}","${new Date().toISOString()}")`
 		);
 		if(result){
 			ctx.redirect(`/post/${data.postId}`);

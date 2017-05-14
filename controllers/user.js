@@ -1,7 +1,7 @@
 const bluebird = require('bluebird');
 const connectionModel = require('../models/connection');
 const crypt = require('../tools/crypt');
-
+const session = require('../tools/session');
 
 exports.login = async function(ctx, next){
 	ctx.render('login');
@@ -21,16 +21,26 @@ exports.doLogin = async function(ctx, next){
 		if(results.length){
 			let user = results[0];
 
+			console.log(crypt.cryptUserId(user.id));
+
+			var sessionId = session.set(user.id, {
+				userId: user.id
+			});
+
+			ctx.cookies.set('sessionId', sessionId, {
+				httpOnly: true,
+				// sameSite: 'strict'
+			});
+
 			// 登录成功，设置cookie
-			ctx.cookies.set('sign', crypt.cryptUserId(user.id), {
+			/*ctx.cookies.set('sign', crypt.cryptUserId(user.id), {
 				httpOnly:false,
 				sameSite:'strict'
 			});
-
 			ctx.cookies.set('userId', user.id, {
 				httpOnly:false,
 				sameSite:'strict'
-			});
+			});*/
 
 
 			ctx.body = {
