@@ -68,9 +68,9 @@ exports.post = async function(ctx, next){
 
 		const connection = connectionModel.getConnection();
 		const id = connection.escape(ctx.params.id);
-		const query = bluebird.promisify(connection.query.bind(connection));
+		const query = bluebird.promisify(connection.execute.bind(connection));
 		const posts = await query(
-			`select * from post where id = "${id}"`
+			'select * from post where id = ?',[id]
 		);
 		let post = posts[0];
 
