@@ -6,7 +6,8 @@ module.exports = sequelize.define('user', {
 		primaryKey: true
 	},
 	username: Sequelize.STRING(32),
-	password: Sequelize.STRING(64)
+	password: Sequelize.STRING(64),
+	salt: Sequelize.STRING(64)
 }, {
 	tableName: 'user'
 });

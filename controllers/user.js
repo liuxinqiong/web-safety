@@ -3,6 +3,7 @@ const connectionModel = require('../models/connection');
 const User = require('../models/user');
 const crypt = require('../tools/crypt');
 const session = require('../tools/session');
+const password = require('../tools/password');
 
 exports.login = async function(ctx, next){
 	ctx.render('login');
@@ -14,13 +15,33 @@ exports.doLogin = async function(ctx, next){
 		const data = ctx.request.body;
 		const user = await User.findOne({
 			where:{
-				username: data.username,
-				password: data.password
+				username: data.username
 			}
 		});
 		if(user){
 
-			console.log(crypt.cryptUserId(user.id));
+			var salt = user.salt;
+			if(!salt){
+				console.log('没有salt，准备更新密码');
+				salt = password.getSalt();
+				console.log(salt);
+				let encryptedPassword = password.encryptPassword(salt, user.password);
+				await User.update({
+					salt: salt,
+					password: encryptedPassword
+				},{
+					where: {
+						id: user.id
+					}
+				});
+				user.salt = salt;
+				user.password = encryptedPassword;
+				console.log('没有salt，更新密码成功');
+			}
+			let encryptedPassword = password.encryptPassword(salt, data.password);
+			if(user.password !== encryptedPassword){
+				throw new Error('登录出错');
+			}
 
 			var sessionId = session.set(user.id, {
 				userId: user.id
