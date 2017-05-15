@@ -1,5 +1,6 @@
 const bluebird = require('bluebird');
 const connectionModel = require('../models/connection');
+const User = require('../models/user');
 const crypt = require('../tools/crypt');
 const session = require('../tools/session');
 
@@ -11,15 +12,13 @@ exports.doLogin = async function(ctx, next){
 	try{
 
 		const data = ctx.request.body;
-		const connection = connectionModel.getConnection();
-		const query = bluebird.promisify(connection.query.bind(connection));
-		const results = await query(
-			`select * from user where
-			username = '${data.username}'
-			and password = '${data.password}'`
-		);
-		if(results.length){
-			let user = results[0];
+		const user = await User.findOne({
+			where:{
+				username: data.username,
+				password: data.password
+			}
+		});
+		if(user){
 
 			console.log(crypt.cryptUserId(user.id));
 
@@ -54,7 +53,6 @@ exports.doLogin = async function(ctx, next){
 			throw new Error('登录失败');
 		}
 
-		connection.end();
 	}catch(e){
 		console.log('[/user/login] error:', e.message, e.stack);
 		ctx.body = {

@@ -64,28 +64,27 @@ var xssFilter = function(html){
 
 exports.post = async function(ctx, next){
 	try{
-		console.log('enter post');
 
-		const connection = connectionModel.getConnection();
-		const id = connection.escape(ctx.params.id);
-		const query = bluebird.promisify(connection.execute.bind(connection));
-		const posts = await query(
-			'select * from post where id = ?',[id]
-		);
-		let post = posts[0];
+		var Post = require('../models/post');
+		var Comment = require('../models/comment');
+		let post = await Post.findById(ctx.params.id);
+		let comments = await Comment.findAll({
+			where:{
+				postId:post.id
+			}
+		});
 
-		const comments = await query(
+		/*const comments = await query(
 			`select comment.*,user.username from comment left join user on comment.userId = user.id where postId = "${post.id}" order by comment.createdAt desc`
 		);
 		comments.forEach(function(comment) {
 			comment.content = xssFilter(comment.content);
-		});
+		});*/
 		if(post){
 			ctx.render('post', {post, comments});
 		}else{
 			ctx.status = 404;
 		}
-		connection.end();
 	}catch(e){
 		console.log('[/site/post] error:', e.message, e.stack);
 		ctx.body = {
