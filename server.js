@@ -1,5 +1,8 @@
 const Koa = require('koa');
 const app = new Koa();
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
 
 const koaStatic = require('koa-static');
 app.use(koaStatic('./static', {
@@ -21,6 +24,12 @@ routes.forEach((route) => {
 	app.use(require(`./routes/${route}`).routes());
 });
 
-app.listen(1521, function(){
-	console.log('App is listening on port 1521');
+http.createServer(app.callback()).listen(1521, function(){
+	console.log('App http is listening on port 1521');
+});
+https.createServer({
+	key: fs.readFileSync('./cert/private.key'),
+	cert: fs.readFileSync('./cert/fullchain.crt')
+}, app.callback()).listen(1522, function(){
+	console.log('App https is listening on port 1522');
 });
