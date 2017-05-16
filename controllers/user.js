@@ -12,20 +12,27 @@ exports.login = async function(ctx, next){
 exports.doLogin = async function(ctx, next){
 	try{
 
+		// 提交的数据
 		const data = ctx.request.body;
+		// 用户已存在的数据
 		const user = await User.findOne({
 			where:{
 				username: data.username
 			}
 		});
-		if(user){
 
+		// 如果用户存在
+		if(user){
+			// 并且有盐，说明已经处理过了
 			var salt = user.salt;
+			// 如果没有盐，需要加盐升级
 			if(!salt){
+
 				console.log('没有salt，准备更新密码');
 				salt = password.getSalt();
+				var newPassword = password.getPasswordFromText(user.username, user.password);
 				console.log(salt);
-				let encryptedPassword = password.encryptPassword(salt, user.password);
+				let encryptedPassword = password.encryptPassword(salt, newPassword);
 				await User.update({
 					salt: salt,
 					password: encryptedPassword

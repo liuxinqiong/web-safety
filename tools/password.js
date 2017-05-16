@@ -7,6 +7,11 @@ var md5 = function(str){
 	return md5Hash.digest('hex');
 };
 
+password.getPasswordFromText = function(username, password){
+	var SUGAR = '!@FDSA^U^FSAFDAH^*#@';
+	return md5(username + SUGAR + password);
+};
+
 password.getSalt = function(){
 	return md5(Math.random()*999999+''+new Date().getTime());
 };
