@@ -24,12 +24,12 @@ routes.forEach((route) => {
 	app.use(require(`./routes/${route}`).routes());
 });
 
-http.createServer(app.callback()).listen(1521, function(){
-	console.log('App http is listening on port 1521');
+http.createServer(app.callback()).listen(80, function(){
+	console.log('App http is listening on port 80');
 });
 https.createServer({
 	key: fs.readFileSync('./cert/private.key'),
 	cert: fs.readFileSync('./cert/fullchain.crt')
-}, app.callback()).listen(1522, function(){
-	console.log('App https is listening on port 1522');
+}, app.callback()).listen(443, function(){
+	console.log('App https is listening on port 443');
 });
