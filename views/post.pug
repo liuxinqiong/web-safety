@@ -34,7 +34,7 @@ html
 								each comment in comments
 									li.card.lighten-5
 										.card-content
-											p.info #{comment.username || '匿名用户'} #{comment.createdAt.toISOString().replace(/T.*/,'')}
+											p.info #{comment.username || '匿名用户'} #{comment.createdAt.toISOString && comment.createdAt.toISOString().replace(/T.*/,'') || comment.createdAt}
 											p.content !{comment.content}
 
 		script(src="/jspm_packages/system.js")

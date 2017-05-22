@@ -73,7 +73,6 @@ exports.post = async function(ctx, next){
 				postId:post.id
 			}
 		});
-
 		/*const comments = await query(
 			`select comment.*,user.username from comment left join user on comment.userId = user.id where postId = "${post.id}" order by comment.createdAt desc`
 		);
@@ -127,7 +126,7 @@ exports.addComment = async function(ctx, next){
 		const connection = connectionModel.getConnection();
 		const query = bluebird.promisify(connection.query.bind(connection));
 		const result = await query(
-			`insert into comment(userId,postId,content,createdAt) values("${userId}", "${data.postId}", "${data.content}","${new Date().toISOString()}")`
+			`insert into comment(userId,postId,content,createdAt) values("${userId}", "${data.postId}", "${data.content}","${connection.escape(new Date())}")`
 		);
 		if(result){
 			ctx.redirect(`/post/${data.postId}`);
