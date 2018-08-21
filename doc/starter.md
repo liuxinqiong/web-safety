@@ -221,3 +221,25 @@ Cookies和CSRF关系
 Cookies安全策略
 * 签名防篡改
 * 私有变化（加密）
+* httpOnly
+* secure
+* sameSite
+
+点击劫持
+* 通过用户的点击完成了一个操作，但是用户并不知情
+* 原理：通过iframe访问目标网站，但是对于用户而言不可见，通过按钮等元素的重叠效果，触发指定操作
+* 危害：盗取用户资金，获取用户敏感信息等
+
+点击劫持防御
+* 攻击前提：被内嵌到iframe中
+* JavaScript禁止内嵌（top对象）
+```js
+if(top.location !== window.location) {
+    top.loction = window.location
+}
+```
+* 如果攻击者禁用JS功能呢（iframe的sandbox属性）
+* X-FRAME-OPTIONS 头禁止内嵌，兼容性很好，推荐解决点击劫持方案
+  * DENY
+  * SAME-ORIGIN
+  * ALLOW-FROM + url
