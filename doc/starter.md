@@ -40,9 +40,9 @@ XSS攻击注入点（永远不要相信用户输入）
 HTML内容转义
 ```js
 var escapeHtml = function(str) {
-    if(!str) return '';
-    str = str.replace(/&/g, '&amp;')//只能最前面
-	str = str.replace(/</g, '&lt;');
+  if(!str) return '';
+  str = str.replace(/&/g, '&amp;')//只能最前面
+  str = str.replace(/</g, '&lt;');
 	str = str.replace(/>/g, '&gt;');
 	return str;
 };
@@ -53,8 +53,8 @@ HTML属性转义
 var escapeHtmlProperty = function(str) {
 	if(!str) return '';
 	str = str.replace(/"/g, '&quto;');
-    str = str.replace(/'/g, '&#39;');
-    str = str.replace(/ /g, '&#39;'); // 因为属性也是可以不带引号的，当然按照规范编码，都是要带引号的
+  str = str.replace(/'/g, '&#39;');
+  str = str.replace(/ /g, '&#39;'); // 因为属性也是可以不带引号的，当然按照规范编码，都是要带引号的
 	return str;
 };
 ```
@@ -165,7 +165,7 @@ CSRF防御
     2. 放Cookie中
     3. 那Cookie中token和表单token做校验
   * token是需要放表单的，那么如果是ajax请求呢，可以在页面添加meta值，手动通过JS读取
-  * token存在的问题，如果打开多个页面，因为token会刷新，因此只有最后一个会生效
+  * token存在的问题，如果打开多个页面，因为cookies中token会刷新，而页面中token是保存不变的，因此只有最后一个会生效
 * 验证referer（referrer技术错误）
   * 禁止来自第三方网站的请求
   * 正则验证referer
