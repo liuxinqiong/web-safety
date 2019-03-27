@@ -11,32 +11,32 @@ XSS（Cross Site Scripting 跨站脚本攻击）
 * ...
 
 危害性：
-* URL传播，反射型XSS
-* 社交平台如果有存储型XSS，通过分享可以大批量获取用户登录态
-* 通过存储型XSS得到后台管理系统权限
+* URL 传播，反射型 XSS
+* 社交平台如果有存储型 XSS，通过分享可以大批量获取用户登录态
+* 通过存储型 XSS 得到后台管理系统权限
 
 XSS攻击分类
-* 反射型：URL参数直接出入
-* 存储型：存储到DB后读取注入
+* 反射型：URL 参数直接注入
+* 存储型：存储到 DB 后读取注入
 * 反射型危害相比存储型要小一点
 
 因为反射型，用户多少会觉得路径有点奇怪，但也有办法消除这个顾虑，比如通过短网址，二维码传播等
 
 XSS攻击注入点（永远不要相信用户输入）
-* HTML节点内容
-* HTML属性（用户输入超出属性本身）
-* JavaSript代码（变量提前关闭）
-* 富文本（富文本得保留HTML）
+* HTML 节点内容
+* HTML 属性（用户输入超出属性本身）
+* JavaScript 代码（变量提前关闭）
+* 富文本（富文本得保留 HTML ）
 
 防御
 * 浏览器自带防御
-  * X-XSS-Protection的header，默认开启
-  * 值有0关闭，1开启，1+url（出现攻击时会向url发送通知）
-  * 针对反射型XSS，且参数出现在HTML内容或属性
+  * X-XSS-Protection 的 header，默认开启
+  * 值有 0 关闭，1 开启，1+url（出现攻击时会向url发送通知）
+  * 针对反射型 XSS，且参数出现在 HTML 内容或属性
 * 内容转义
   * 时机：插入数据库之前或显示时转义
   * 具体转移字符见函数
-  
+
 HTML内容转义
 ```js
 var escapeHtml = function(str) {
@@ -59,9 +59,9 @@ var escapeHtmlProperty = function(str) {
 };
 ```
 
-> 当然这两个函数可以直接合并为一个escapeHtml函数，这里仅是为了区分作用
+> 当然这两个函数可以直接合并为一个 escapeHtml 函数，这里仅是为了区分作用
 
-JavaScript转义，对数据中引号进行转义，这里不能转义成实体
+JavaScript 转义，对数据中引号进行转义，这里不能转义成实体
 ```js
 var escapeForJs = function(str) {
     if(!str) return ''
@@ -72,10 +72,10 @@ var escapeForJs = function(str) {
 }
 ```
 
-以上也不是最保险的解决方案，最保险方案且简便的方案，可以直接对数据做一次JSON.stringify
+以上也不是最保险的解决方案，最保险方案且简便的方案，可以直接对数据做一次 JSON.stringify
 
 富文本
-* 由于是富文本，因此需要保留HTML格式，因此没办法全部转义
+* 由于是富文本，因此需要保留 HTML格 式，因此没办法全部转义
 * 过滤
   1. 按照黑名单过滤，实现比较简单，但是很难考虑到所有情况，容易留下漏洞
   2. 按照白名单保留部分标签和属性，比较彻底，但实现比较麻烦
@@ -93,7 +93,7 @@ var xssFilter = function(html) {
 ```
 
 白名单方式
-* 将字符串解析成DOM树（cheerio库）
+* 将字符串解析成 DOM 树（cheerio库）
 * 在白名单保留，不在移除
 * 转成字符串
 
@@ -128,16 +128,16 @@ var xssFilter = function(html) {
 
 终极解决方案：CSP
 * Content Security Policy 内容安全策略，用于指定哪些内容可执行
-* HTTP头
+* HTTP 头
 
-CSRF攻击（Cross Site Request Forgy）
+CSRF 攻击（Cross Site Request Forgy）
 * 跨站请求伪造，别称：One Click Attack
 * 区别
-  * XSS本网站运行了来自其他网站的脚本
-  * CSRF指其他网站对本网站产生了影响，其他网站对目标网站发起了请求，在用户不知情的情况下完成
-* GET与POST
-  * 如果请求支持GET，则攻击来的更简单的，可以是标签href属性或src属性值即可
-  * POST属性需要构建表单提交，攻击成本也只是稍微高一点
+  * XSS 本网站运行了来自其他网站的脚本
+  * CSRF 指其他网站对本网站产生了影响，其他网站对目标网站发起了请求，在用户不知情的情况下完成
+* GET 与 POST
+  * 如果请求支持 GET，则攻击来的更简单的，可以是标签 href 属性或 src 属性值即可
+  * POST 属性需要构建表单提交，攻击成本也只是稍微高一点
 
 CSRF攻击原理
 1. 用户登录A网站
@@ -152,34 +152,34 @@ CSRF攻击危害
 
 CSRF防御
 * 通过原理可以发现特征
-  * 会带上A网站Cookie
-  * 不访问A网站前端
-  * HTTP头中referer会为B网站
-* 禁止第三方网站带Cookies
-  * same-site属性，限制为同域名
+  * 会带上 A 网站 Cookie
+  * 不访问 A 网站前端
+  * HTTP 头中 referer 会 为B 网站
+* 禁止第三方网站带 Cookies
+  * same-site 属性，限制为同域名
   * 缺点：兼容性不怎么样啊
 * 在前端页面加入验证信息
-  * 验证码（ccap库），用户体验有伤害
+  * 验证码（ccap 库），用户体验有伤害
   * token，本质随机字符串
     1. 放表单中
     2. 放Cookie中
-    3. 那Cookie中token和表单token做校验
-  * token是需要放表单的，那么如果是ajax请求呢，可以在页面添加meta值，手动通过JS读取
-  * token存在的问题，如果打开多个页面，因为cookies中token会刷新，而页面中token是保存不变的，因此只有最后一个会生效
-* 验证referer（referrer技术错误）
+    3. 那 Cookie 中 token 和表单 token 做校验
+  * token 是需要放表单的，那么如果是 ajax 请求呢，可以在页面添加 meta 值，手动通过 JS 读取
+  * token 存在的问题，如果打开多个页面，因为 cookies 中 token 会刷新，而页面中 token 是保存不变的，因此只有最后一个会生效
+* 验证 referer（referrer技术错误）
   * 禁止来自第三方网站的请求
-  * 正则验证referer
+  * 正则验证 referer
 
 Cookies特性
 * 前端数据存储
-* 后端通过http头设置
-* 请求时通过http头传给后端
+* 后端通过 http 头设置
+* 请求时通过 http 头传给后端
 * 前端可读写
 * 遵守同源策略
 
 Cookies属性
-* 域名domain
-* 有效期expires：Session值表示仅会话有效，删除cookie也是通过有效期实现的
+* 域名 domain
+* 有效期 expires：Session 值表示仅会话有效，删除 cookie 也是通过有效期实现的
 * 路径path：层级作用域
 * httpOnly
 * secure（仅https）
@@ -194,31 +194,31 @@ Cookies作用
 登录用户凭证流程
 * 前端提交用户名密码
 * 后端验证用户名和密码
-* 后端通过http头设置用户凭证
+* 后端通过 http 头设置用户凭证
 * 后续访问后端先验证用户凭证
 
 用户凭证
-* 用户ID
-  * 如果用户ID比较简单，容易伪造
-  * 加固：用户ID + 签名
+* 用户 ID
+  * 如果用户 ID 比较简单，容易伪造
+  * 加固：用户 ID + 签名
   * 加固后如何对应用户呢
-    * 签名和用户的存储在redis中，需要消耗服务端性能
-    * 签名和用户ID同时下发Cookie，后续请求去ID进行同样的签名，然后校验两个签名
+    * 签名和用户的存储在 redis 中，需要消耗服务端性能
+    * 签名和用户ID同时下发 Cookie，后续请求去 ID 进行同样的签名，然后校验两个签名
 * SessionId
   * 用户数据放内存中，建立对应关系
-  * 生产环境不能放内存，因为内存有限的，而且重启会丢失，一般会选择放外部存储机做session持久化方案
+  * 生产环境不能放内存，因为内存有限的，而且重启会丢失，一般会选择放外部存储机做 session 持久化方案
 * Token
 
-Cookies和XSS关系
-* XSS可能偷去Cookies
-* httpOnly的Cookie不会被偷
+Cookies 和 XSS 关系
+* XSS 可能偷去 Cookies
+* httpOnly 的 Cookie 不会被偷
 
-Cookies和CSRF关系
-* CSRF利用了用户Cookies
-* 站点攻击无法读写Cookies
-* 最好能阻止第三方使用Cookies
+Cookies 和 CSRF关系
+* CSRF 利用了用户 Cookies
+* 站点攻击无法读写 Cookies
+* 最好能阻止第三方使用 Cookies
 
-Cookies安全策略
+Cookies 安全策略
 * 签名防篡改
 * 私有变化（加密）
 * httpOnly
@@ -227,7 +227,7 @@ Cookies安全策略
 
 点击劫持
 * 通过用户的点击完成了一个操作，但是用户并不知情
-* 原理：通过iframe访问目标网站，但是对于用户而言不可见，通过按钮等元素的重叠效果，触发指定操作
+* 原理：通过 iframe 访问目标网站，但是对于用户而言不可见，通过按钮等元素的重叠效果，触发指定操作
 * 危害：盗取用户资金，获取用户敏感信息等
 
 点击劫持防御
@@ -238,7 +238,7 @@ if(top.location !== window.location) {
     top.loction = window.location
 }
 ```
-* 如果攻击者禁用JS功能呢（iframe的sandbox属性）
+* 如果攻击者禁用JS功能呢（iframe 的 sandbox 属性）
 * X-FRAME-OPTIONS 头禁止内嵌，兼容性很好，推荐解决点击劫持方案
   * DENY
   * SAME-ORIGIN
